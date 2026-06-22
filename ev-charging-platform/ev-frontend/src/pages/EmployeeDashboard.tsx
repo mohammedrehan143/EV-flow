@@ -160,19 +160,8 @@ const EmployeeDashboard = () => {
             </div>
           </form>
 
-          <div className="auth-animate mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-white/10 text-[9px] font-black text-white/30 uppercase tracking-[0.2em] space-y-2 text-left max-h-44 overflow-y-auto pr-2">
+          <div className="auth-animate mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-white/10 text-[9px] font-black text-white/30 uppercase tracking-[0.2em] text-center">
             <p>Enter your station's unique clearance passkey, or the master admin key for global access.</p>
-            <p className="text-white/50">Admin key: <span className="text-primary">ADMIN123</span></p>
-            <p className="text-white/40 mt-2 font-bold">Station Passkeys for Testing:</p>
-            <ul className="list-disc pl-4 space-y-1 text-white/50">
-              <li>Taj West End Charging Hub: <span className="text-secondary font-bold">TAJ123</span></li>
-              <li>BESCOM KR Circle Station: <span className="text-secondary font-bold">BESCOM456</span></li>
-              <li>UB City Charging Point: <span className="text-secondary font-bold">UBCITY789</span></li>
-              <li>Croma Koramangala Station: <span className="text-secondary font-bold">CROMA000</span></li>
-              <li>Phoenix Marketcity Station: <span className="text-secondary font-bold">PHOENIX555</span></li>
-              <li>Electronic City EZ Charge: <span className="text-secondary font-bold">ECITY888</span></li>
-              <li>Jayanagar 4th Block Node: <span className="text-secondary font-bold">JAYANAGAR222</span></li>
-            </ul>
           </div>
         </div>
       </div>

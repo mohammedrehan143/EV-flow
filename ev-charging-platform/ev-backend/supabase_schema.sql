@@ -46,7 +46,7 @@ CREATE POLICY "Allow all to anon" ON slots TO anon USING (true) WITH CHECK (true
 -- Seed Settings
 INSERT INTO settings (key, value) VALUES ('adminPasskey', 'ADMIN123');
 
--- Seed Stations (7 Real-World EV hubs in Bengaluru)
+-- Seed Stations (7 Central hubs + 2 Yelahanka hubs in Bengaluru)
 INSERT INTO stations (id, name, passkey, lat, lng) VALUES
 (1, 'Taj West End Charging Hub', 'TAJ123', 12.9786, 77.5843),
 (2, 'BESCOM KR Circle Station', 'BESCOM456', 12.9748, 77.5855),
@@ -54,7 +54,9 @@ INSERT INTO stations (id, name, passkey, lat, lng) VALUES
 (4, 'Croma Koramangala Station', 'CROMA000', 12.9344, 77.6200),
 (5, 'Phoenix Marketcity Station', 'PHOENIX555', 12.9958, 77.6963),
 (6, 'Electronic City EZ Charge', 'ECITY888', 12.8468, 77.6766),
-(7, 'Jayanagar 4th Block Node', 'JAYANAGAR222', 12.9290, 77.5828);
+(7, 'Jayanagar 4th Block Node', 'JAYANAGAR222', 12.9290, 77.5828),
+(8, 'Shell Recharge Station', 'SHELL111', 13.1043, 77.6045),
+(9, 'GLIDA Mandovi Motors Station', 'GLIDA222', 13.1008, 77.5963);
 
 -- Seed Slots (5 slots per station with realistic values)
 INSERT INTO slots (station_id, slot_index, status, type, power) VALUES
@@ -105,4 +107,18 @@ INSERT INTO slots (station_id, slot_index, status, type, power) VALUES
 (7, 702, 'empty', 'AC Type-2', '22kW'),
 (7, 703, 'empty', 'AC Type-2', '22kW'),
 (7, 704, 'empty', 'AC Type-2', '7.4kW'),
-(7, 705, 'empty', 'AC Type-2', '7.4kW');
+(7, 705, 'empty', 'AC Type-2', '7.4kW'),
+
+-- Shell Recharge (8)
+(8, 801, 'empty', 'DC Fast', '60kW'),
+(8, 802, 'empty', 'DC Fast', '60kW'),
+(8, 803, 'empty', 'AC Type-2', '22kW'),
+(8, 804, 'empty', 'AC Type-2', '22kW'),
+(8, 805, 'full', 'AC Type-2', '7.4kW'),
+
+-- GLIDA Mandovi (9)
+(9, 901, 'empty', 'DC Fast', '50kW'),
+(9, 902, 'empty', 'DC Fast', '50kW'),
+(9, 903, 'empty', 'AC Type-2', '22kW'),
+(9, 904, 'empty', 'AC Type-2', '22kW'),
+(9, 905, 'empty', 'AC Type-2', '22kW');

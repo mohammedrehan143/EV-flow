@@ -117,6 +117,34 @@ const defaultData = {
         { id: 704, status: 'empty', type: 'AC Type-2', power: '7.4kW' },
         { id: 705, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
       ]
+    },
+    {
+      id: 8,
+      name: 'Shell Recharge Station',
+      passkey: 'SHELL111',
+      lat: 13.1043,
+      lng: 77.6045,
+      slots: [
+        { id: 801, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 802, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 803, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 804, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 805, status: 'full', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 9,
+      name: 'GLIDA Mandovi Motors Station',
+      passkey: 'GLIDA222',
+      lat: 13.1008,
+      lng: 77.5963,
+      slots: [
+        { id: 901, status: 'empty', type: 'DC Fast', power: '50kW' },
+        { id: 902, status: 'empty', type: 'DC Fast', power: '50kW' },
+        { id: 903, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 904, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 905, status: 'empty', type: 'AC Type-2', power: '22kW' }
+      ]
     }
   ]
 };

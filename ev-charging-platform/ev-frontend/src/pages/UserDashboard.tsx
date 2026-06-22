@@ -34,6 +34,19 @@ const evIcon = L.divIcon({
   iconAnchor: [24, 24],
 });
 
+// Custom User Location Icon (Pulsing Blue Dot)
+const userIcon = L.divIcon({
+  className: 'custom-user-icon',
+  html: `
+    <div class="w-8 h-8 relative flex items-center justify-center">
+      <div class="absolute w-8 h-8 bg-secondary/30 rounded-full animate-ping"></div>
+      <div class="relative w-4 h-4 bg-secondary rounded-full border-2 border-white shadow-[0_0_10px_#00bfff]"></div>
+    </div>
+  `,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
+
 const center: [number, number] = [12.9716, 77.5946];
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -290,7 +303,7 @@ const UserDashboard = () => {
               ))}
               
               {userLocation && (
-                <Marker position={[userLocation.lat, userLocation.lng]}>
+                <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
                   <Popup>User Position</Popup>
                 </Marker>
               )}

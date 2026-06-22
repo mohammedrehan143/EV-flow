@@ -94,7 +94,7 @@ body::before {
   background: #050505 !important;
 }
 
-.custom-ev-icon {
+.custom-ev-icon, .custom-user-icon {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
