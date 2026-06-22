@@ -6,6 +6,14 @@ import { Zap, Navigation, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { gsap } from 'gsap';
 import Magnetic from '../components/Magnetic';
 
+// Resolve Leaflet default icon asset path issues in Vite
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>',
+  iconUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>',
+  shadowUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>',
+});
+
 // Sub-component to safely access and expose Leaflet map instance
 const MapController = ({ setMapInstance }: { setMapInstance: (map: L.Map) => void }) => {
   const map = useMap();
