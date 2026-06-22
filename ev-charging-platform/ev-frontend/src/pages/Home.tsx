@@ -154,7 +154,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section ref={featureRef} className="py-10 md:py-16 bg-white/2">
+      <section ref={featureRef} className="pt-10 pb-2 md:pt-16 md:pb-4 bg-white/2">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-10 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-2xl">
@@ -192,7 +192,7 @@ const Home = () => {
       </section>
 
       {/* Storytelling Section */}
-      <section className="py-12 md:py-20 relative reveal-section">
+      <section className="pt-2 pb-12 md:pt-4 md:pb-20 relative reveal-section">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h3 className="font-display text-3xl md:text-5xl font-black mb-10 leading-tight tracking-tight">
             "THE FUTURE OF MOBILITY IS NOT JUST ELECTRIC. <span className="text-primary">IT'S CONNECTED.</span>"
