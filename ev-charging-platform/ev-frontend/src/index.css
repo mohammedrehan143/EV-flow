@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #00ff88;
+  --color-secondary: #00bfff;
+  --color-accent: #ff00ea;
+  --color-dark: #050505;
+  --color-card: #0c0c0c;
+  --color-border: rgba(255, 255, 255, 0.08);
+  
+  --font-display: 'Clash Display', 'Inter', system-ui;
+  
+  --animate-pulse-slow: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+:root {
+  color-scheme: dark;
+  --cursor-size: 20px;
+}
+
+.custom-cursor-active, .custom-cursor-active * {
+  cursor: none !important;
+}
+
+@media (max-width: 1024px) {
+  .custom-cursor-active, .custom-cursor-active * { cursor: auto !important; }
+}
+
+body {
+  margin: 0;
+  background-color: #050505;
+  color: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Luxury Noise Overlay - Lowered z-index and opacity */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+/* Glassmorphism Classes - Made more distinct */
+.glass {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-bright {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Typography Split Reveal - Safer approach */
+.char {
+  display: inline-block;
+}
+
+/* Dark Map UI - Using High Quality Native Dark Tiles with Brightness Boost */
+.leaflet-container {
+  background: #050505 !important;
+}
+
+.custom-ev-icon {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-pane {
+  /* Adding a slight brightness boost to prevent 'dull' appearance */
+  filter: brightness(1.2) contrast(1.1);
+}
+
+.leaflet-bar a {
+  background-color: #1a1a1a !important;
+  color: #00ff88 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: #0c0c0c !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  border-radius: 12px !important;
+}
+
+/* Magnetic Button Helper */
+.magnetic-area {
+  position: relative;
+  display: inline-block;
+}
+
+/* Premium Mesh Background */
+.mesh-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(at 0% 0%, rgba(0, 255, 136, 0.15) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(0, 191, 255, 0.15) 0, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(255, 0, 234, 0.1) 0, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(0, 255, 136, 0.1) 0, transparent 50%);
+  filter: blur(100px);
+  z-index: -1;
+}

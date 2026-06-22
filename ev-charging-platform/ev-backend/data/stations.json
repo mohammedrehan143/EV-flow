@@ -1,0 +1,200 @@
+{
+  "adminPasskey": "ADMIN123",
+  "stations": [
+    {
+      "id": 1,
+      "name": "GreenCharge Central",
+      "passkey": "GREEN123",
+      "lat": 12.9716,
+      "lng": 77.5946,
+      "slots": [
+        {
+          "id": 101,
+          "status": "empty",
+          "type": "DC",
+          "power": "50kW"
+        },
+        {
+          "id": 102,
+          "status": "empty",
+          "type": "DC",
+          "power": "50kW"
+        },
+        {
+          "id": 103,
+          "status": "full",
+          "type": "AC",
+          "power": "22kW"
+        },
+        {
+          "id": 104,
+          "status": "empty",
+          "type": "AC",
+          "power": "22kW"
+        },
+        {
+          "id": 105,
+          "status": "empty",
+          "type": "AC",
+          "power": "22kW"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "EcoVolt Hub",
+      "passkey": "ECO456",
+      "lat": 12.98,
+      "lng": 77.6,
+      "slots": [
+        {
+          "id": 201,
+          "status": "empty",
+          "type": "DC",
+          "power": "100kW"
+        },
+        {
+          "id": 202,
+          "status": "empty",
+          "type": "DC",
+          "power": "100kW"
+        },
+        {
+          "id": 203,
+          "status": "empty",
+          "type": "DC",
+          "power": "100kW"
+        },
+        {
+          "id": 204,
+          "status": "full",
+          "type": "DC",
+          "power": "100kW"
+        },
+        {
+          "id": 205,
+          "status": "empty",
+          "type": "DC",
+          "power": "100kW"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "SpeedCharge Station",
+      "passkey": "SPEED789",
+      "lat": 12.96,
+      "lng": 77.58,
+      "slots": [
+        {
+          "id": 301,
+          "status": "full",
+          "type": "AC",
+          "power": "7kW"
+        },
+        {
+          "id": 302,
+          "status": "empty",
+          "type": "AC",
+          "power": "7kW"
+        },
+        {
+          "id": 303,
+          "status": "empty",
+          "type": "AC",
+          "power": "7kW"
+        },
+        {
+          "id": 304,
+          "status": "empty",
+          "type": "AC",
+          "power": "7kW"
+        },
+        {
+          "id": 305,
+          "status": "empty",
+          "type": "AC",
+          "power": "7kW"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Urban Volt Pro",
+      "passkey": "PRO000",
+      "lat": 12.975,
+      "lng": 77.596,
+      "slots": [
+        {
+          "id": 401,
+          "status": "empty",
+          "type": "DC",
+          "power": "150kW"
+        },
+        {
+          "id": 402,
+          "status": "empty",
+          "type": "DC",
+          "power": "150kW"
+        },
+        {
+          "id": 403,
+          "status": "empty",
+          "type": "DC",
+          "power": "150kW"
+        },
+        {
+          "id": 404,
+          "status": "empty",
+          "type": "DC",
+          "power": "150kW"
+        },
+        {
+          "id": 405,
+          "status": "empty",
+          "type": "DC",
+          "power": "150kW"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "NanoCharge Point",
+      "passkey": "NANO111",
+      "lat": 12.97,
+      "lng": 77.593,
+      "slots": [
+        {
+          "id": 501,
+          "status": "empty",
+          "type": "AC",
+          "power": "11kW"
+        },
+        {
+          "id": 502,
+          "status": "empty",
+          "type": "AC",
+          "power": "11kW"
+        },
+        {
+          "id": 503,
+          "status": "empty",
+          "type": "AC",
+          "power": "11kW"
+        },
+        {
+          "id": 504,
+          "status": "empty",
+          "type": "AC",
+          "power": "11kW"
+        },
+        {
+          "id": 505,
+          "status": "empty",
+          "type": "AC",
+          "power": "11kW"
+        }
+      ]
+    }
+  ]
+}
