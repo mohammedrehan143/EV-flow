@@ -109,7 +109,7 @@ app.put('/api/stations/:stationId/slots/:slotId', async (req, res) => {
     const station = await db.getStationById(parseInt(stationId));
     if (!station) return res.status(404).json({ error: 'Station not found' });
 
-    const slot = station.slots.find(s => s.id === parseInt(slotId));
+    const slot = station.slots.find(s => s.id.toString() === slotId.toString());
     if (!slot) return res.status(404).json({ error: 'Slot not found' });
 
     await db.updateSlotStatus(parseInt(stationId), parseInt(slotId), status);
@@ -128,7 +128,7 @@ app.post('/api/bookings', async (req, res) => {
     const station = await db.getStationById(parseInt(stationId));
     if (!station) return res.status(404).json({ error: 'Station not found' });
 
-    const slot = station.slots.find(s => s.id === parseInt(slotId));
+    const slot = station.slots.find(s => s.id.toString() === slotId.toString());
     if (!slot || slot.status === 'full') {
       return res.status(400).json({ error: 'Slot unavailable' });
     }
