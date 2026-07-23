@@ -46,7 +46,7 @@ CREATE POLICY "Allow all to anon" ON slots TO anon USING (true) WITH CHECK (true
 -- Seed Settings
 INSERT INTO settings (key, value) VALUES ('adminPasskey', 'ADMIN123');
 
--- Seed Stations (7 Central hubs + 2 Yelahanka hubs in Bengaluru)
+-- Seed Stations (20 Stations across Yelahanka, Hebbal, RT Nagar & Central Bengaluru)
 INSERT INTO stations (id, name, passkey, lat, lng) VALUES
 (1, 'Taj West End Charging Hub', 'TAJ123', 12.9786, 77.5843),
 (2, 'BESCOM KR Circle Station', 'BESCOM456', 12.9748, 77.5855),
@@ -56,69 +56,38 @@ INSERT INTO stations (id, name, passkey, lat, lng) VALUES
 (6, 'Electronic City EZ Charge', 'ECITY888', 12.8468, 77.6766),
 (7, 'Jayanagar 4th Block Node', 'JAYANAGAR222', 12.9290, 77.5828),
 (8, 'Shell Recharge Station', 'SHELL111', 13.1043, 77.6045),
-(9, 'GLIDA Mandovi Motors Station', 'GLIDA222', 13.1008, 77.5963);
+(9, 'GLIDA Mandovi Motors Station', 'GLIDA222', 13.1008, 77.5963),
+(10, 'Yelahanka New Town Hub', 'YELAHANKA10', 13.1012, 77.5975),
+(11, 'RMZ Galleria Yelahanka', 'GALLERIA11', 13.0975, 77.5942),
+(12, 'Jakkur Aerodrome EV Point', 'JAKKUR12', 13.0782, 77.5991),
+(13, 'Kogilu Cross EV Spot', 'KOGILU13', 13.1150, 77.6080),
+(14, 'Hebbal Flyover Supercharger', 'HEBBAL14', 13.0358, 77.5970),
+(15, 'Manyata Tech Park Hub', 'MANYATA15', 13.0450, 77.6204),
+(16, 'Esteem Mall Hebbal Station', 'ESTEEM16', 13.0392, 77.5925),
+(17, 'RT Nagar BDA Complex Hub', 'RTNAGAR17', 13.0245, 77.5948),
+(18, 'Ganganagar EV Charge Point', 'GANGANAGAR18', 13.0188, 77.5890),
+(19, 'Dinnur Main Road Node', 'DINNUR19', 13.0210, 77.6012),
+(20, 'Nagavara Junction EZ Station', 'NAGAVARA20', 13.0415, 77.6110);
 
--- Seed Slots (5 slots per station with realistic values)
+-- Seed Slots (5 slots per station)
 INSERT INTO slots (station_id, slot_index, status, type, power) VALUES
--- Taj West End (1)
-(1, 101, 'empty', 'DC Fast', '150kW'),
-(1, 102, 'empty', 'DC Fast', '150kW'),
-(1, 103, 'full', 'AC Type-2', '22kW'),
-(1, 104, 'empty', 'AC Type-2', '22kW'),
-(1, 105, 'empty', 'AC Type-2', '7.4kW'),
-
--- BESCOM KR Circle (2)
-(2, 201, 'empty', 'DC Fast', '50kW'),
-(2, 202, 'empty', 'DC Fast', '50kW'),
-(2, 203, 'empty', 'AC Type-2', '22kW'),
-(2, 204, 'full', 'AC Type-2', '22kW'),
-(2, 205, 'empty', 'AC Type-2', '7.4kW'),
-
--- UB City (3)
-(3, 301, 'empty', 'DC Fast', '100kW'),
-(3, 302, 'empty', 'DC Fast', '100kW'),
-(3, 303, 'empty', 'DC Fast', '100kW'),
-(3, 304, 'full', 'AC Type-2', '22kW'),
-(3, 305, 'empty', 'AC Type-2', '22kW'),
-
--- Croma Koramangala (4)
-(4, 401, 'empty', 'DC Fast', '60kW'),
-(4, 402, 'empty', 'DC Fast', '60kW'),
-(4, 403, 'empty', 'AC Type-2', '22kW'),
-(4, 404, 'empty', 'AC Type-2', '7.4kW'),
-(4, 405, 'empty', 'AC Type-2', '7.4kW'),
-
--- Phoenix Marketcity (5)
-(5, 501, 'empty', 'DC Fast', '120kW'),
-(5, 502, 'empty', 'DC Fast', '120kW'),
-(5, 503, 'empty', 'AC Type-2', '22kW'),
-(5, 504, 'empty', 'AC Type-2', '22kW'),
-(5, 505, 'full', 'AC Type-2', '7.4kW'),
-
--- Electronic City (6)
-(6, 601, 'empty', 'DC Fast', '150kW'),
-(6, 602, 'empty', 'DC Fast', '150kW'),
-(6, 603, 'empty', 'DC Fast', '150kW'),
-(6, 604, 'empty', 'AC Type-2', '22kW'),
-(6, 605, 'empty', 'AC Type-2', '22kW'),
-
--- Jayanagar (7)
-(7, 701, 'empty', 'DC Fast', '50kW'),
-(7, 702, 'empty', 'AC Type-2', '22kW'),
-(7, 703, 'empty', 'AC Type-2', '22kW'),
-(7, 704, 'empty', 'AC Type-2', '7.4kW'),
-(7, 705, 'empty', 'AC Type-2', '7.4kW'),
-
--- Shell Recharge (8)
-(8, 801, 'empty', 'DC Fast', '60kW'),
-(8, 802, 'empty', 'DC Fast', '60kW'),
-(8, 803, 'empty', 'AC Type-2', '22kW'),
-(8, 804, 'empty', 'AC Type-2', '22kW'),
-(8, 805, 'full', 'AC Type-2', '7.4kW'),
-
--- GLIDA Mandovi (9)
-(9, 901, 'empty', 'DC Fast', '50kW'),
-(9, 902, 'empty', 'DC Fast', '50kW'),
-(9, 903, 'empty', 'AC Type-2', '22kW'),
-(9, 904, 'empty', 'AC Type-2', '22kW'),
-(9, 905, 'empty', 'AC Type-2', '22kW');
+(1, 101, 'empty', 'DC Fast', '150kW'), (1, 102, 'empty', 'DC Fast', '150kW'), (1, 103, 'full', 'AC Type-2', '22kW'), (1, 104, 'empty', 'AC Type-2', '22kW'), (1, 105, 'empty', 'AC Type-2', '7.4kW'),
+(2, 201, 'empty', 'DC Fast', '50kW'), (2, 202, 'empty', 'DC Fast', '50kW'), (2, 203, 'empty', 'AC Type-2', '22kW'), (2, 204, 'full', 'AC Type-2', '22kW'), (2, 205, 'empty', 'AC Type-2', '7.4kW'),
+(3, 301, 'empty', 'DC Fast', '100kW'), (3, 302, 'empty', 'DC Fast', '100kW'), (3, 303, 'empty', 'DC Fast', '100kW'), (3, 304, 'full', 'AC Type-2', '22kW'), (3, 305, 'empty', 'AC Type-2', '22kW'),
+(4, 401, 'empty', 'DC Fast', '60kW'), (4, 402, 'empty', 'DC Fast', '60kW'), (4, 403, 'empty', 'AC Type-2', '22kW'), (4, 404, 'empty', 'AC Type-2', '7.4kW'), (4, 405, 'empty', 'AC Type-2', '7.4kW'),
+(5, 501, 'empty', 'DC Fast', '120kW'), (5, 502, 'empty', 'DC Fast', '120kW'), (5, 503, 'empty', 'AC Type-2', '22kW'), (5, 504, 'empty', 'AC Type-2', '22kW'), (5, 505, 'full', 'AC Type-2', '7.4kW'),
+(6, 601, 'empty', 'DC Fast', '150kW'), (6, 602, 'empty', 'DC Fast', '150kW'), (6, 603, 'empty', 'DC Fast', '150kW'), (6, 604, 'empty', 'AC Type-2', '22kW'), (6, 605, 'empty', 'AC Type-2', '22kW'),
+(7, 701, 'empty', 'DC Fast', '50kW'), (7, 702, 'empty', 'AC Type-2', '22kW'), (7, 703, 'empty', 'AC Type-2', '22kW'), (7, 704, 'empty', 'AC Type-2', '7.4kW'), (7, 705, 'empty', 'AC Type-2', '7.4kW'),
+(8, 801, 'empty', 'DC Fast', '60kW'), (8, 802, 'empty', 'DC Fast', '60kW'), (8, 803, 'empty', 'AC Type-2', '22kW'), (8, 804, 'empty', 'AC Type-2', '22kW'), (8, 805, 'full', 'AC Type-2', '7.4kW'),
+(9, 901, 'empty', 'DC Fast', '50kW'), (9, 902, 'empty', 'DC Fast', '50kW'), (9, 903, 'empty', 'AC Type-2', '22kW'), (9, 904, 'empty', 'AC Type-2', '22kW'), (9, 905, 'empty', 'AC Type-2', '22kW'),
+(10, 1001, 'empty', 'DC Fast', '150kW'), (10, 1002, 'empty', 'DC Fast', '150kW'), (10, 1003, 'empty', 'AC Type-2', '22kW'), (10, 1004, 'full', 'AC Type-2', '22kW'), (10, 1005, 'empty', 'AC Type-2', '7.4kW'),
+(11, 1101, 'empty', 'DC Fast', '120kW'), (11, 1102, 'empty', 'DC Fast', '120kW'), (11, 1103, 'empty', 'DC Fast', '120kW'), (11, 1104, 'empty', 'AC Type-2', '22kW'), (11, 1105, 'full', 'AC Type-2', '22kW'),
+(12, 1201, 'empty', 'DC Fast', '100kW'), (12, 1202, 'empty', 'DC Fast', '100kW'), (12, 1203, 'empty', 'AC Type-2', '22kW'), (12, 1204, 'empty', 'AC Type-2', '22kW'), (12, 1205, 'empty', 'AC Type-2', '7.4kW'),
+(13, 1301, 'empty', 'DC Fast', '60kW'), (13, 1302, 'empty', 'DC Fast', '60kW'), (13, 1303, 'empty', 'AC Type-2', '22kW'), (13, 1304, 'empty', 'AC Type-2', '22kW'), (13, 1305, 'full', 'AC Type-2', '7.4kW'),
+(14, 1401, 'empty', 'DC Fast', '180kW'), (14, 1402, 'empty', 'DC Fast', '180kW'), (14, 1403, 'empty', 'DC Fast', '180kW'), (14, 1404, 'full', 'AC Type-2', '22kW'), (14, 1405, 'empty', 'AC Type-2', '22kW'),
+(15, 1501, 'empty', 'DC Fast', '150kW'), (15, 1502, 'empty', 'DC Fast', '150kW'), (15, 1503, 'empty', 'AC Type-2', '22kW'), (15, 1504, 'empty', 'AC Type-2', '22kW'), (15, 1505, 'empty', 'AC Type-2', '7.4kW'),
+(16, 1601, 'empty', 'DC Fast', '60kW'), (16, 1602, 'empty', 'DC Fast', '60kW'), (16, 1603, 'empty', 'AC Type-2', '22kW'), (16, 1604, 'full', 'AC Type-2', '22kW'), (16, 1605, 'empty', 'AC Type-2', '7.4kW'),
+(17, 1701, 'empty', 'DC Fast', '100kW'), (17, 1702, 'empty', 'DC Fast', '100kW'), (17, 1703, 'empty', 'AC Type-2', '22kW'), (17, 1704, 'empty', 'AC Type-2', '22kW'), (17, 1705, 'full', 'AC Type-2', '7.4kW'),
+(18, 1801, 'empty', 'DC Fast', '50kW'), (18, 1802, 'empty', 'DC Fast', '50kW'), (18, 1803, 'empty', 'AC Type-2', '22kW'), (18, 1804, 'empty', 'AC Type-2', '22kW'), (18, 1805, 'empty', 'AC Type-2', '7.4kW'),
+(19, 1901, 'empty', 'DC Fast', '60kW'), (19, 1902, 'empty', 'DC Fast', '60kW'), (19, 1903, 'empty', 'AC Type-2', '22kW'), (19, 1904, 'empty', 'AC Type-2', '22kW'), (19, 1905, 'full', 'AC Type-2', '7.4kW'),
+(20, 2001, 'empty', 'DC Fast', '150kW'), (20, 2002, 'empty', 'DC Fast', '150kW'), (20, 2003, 'empty', 'AC Type-2', '22kW'), (20, 2004, 'empty', 'AC Type-2', '22kW'), (20, 2005, 'empty', 'AC Type-2', '7.4kW');

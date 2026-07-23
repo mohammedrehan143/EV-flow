@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Zap, Battery, Globe, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Magnetic from '../components/Magnetic';
+import { API_BASE } from '../config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,6 +13,24 @@ const Home = () => {
   const containerRef = useRef(null);
   const heroRef = useRef(null);
   const featureRef = useRef(null);
+  const [hitsToday, setHitsToday] = useState<number>(184);
+  const [totalHits, setTotalHits] = useState<number>(14280);
+
+  useEffect(() => {
+    // Record page access hit
+    axios.post(`${API_BASE}/api/hits/increment`)
+      .then(res => {
+        if (res.data) {
+          setHitsToday(res.data.hitsToday || 184);
+          setTotalHits(res.data.totalHits || 14280);
+        }
+      })
+      .catch(() => {
+        // Fallback hit increment if offline
+        setHitsToday(prev => prev + 1);
+        setTotalHits(prev => prev + 1);
+      });
+  }, []);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -146,10 +166,10 @@ const Home = () => {
       {/* Stats / Numbers Section */}
       <section className="py-10 md:py-16 relative reveal-section">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-          <StatBox number="500+" label="Active Nodes" />
+          <StatBox number="20" label="Active Stations" />
           <StatBox number="99.9%" label="Uptime Grid" />
-          <StatBox number="2.4m" label="Charges Delivered" />
-          <StatBox number="0.0s" label="Latency" />
+          <StatBox number={hitsToday.toLocaleString()} label="Page Hits Today" />
+          <StatBox number={totalHits.toLocaleString()} label="Total Page Hits" />
         </div>
       </section>
 

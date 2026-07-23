@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Zap, Search, CheckCircle2, XCircle, ArrowLeft, ChevronRight, MapPin } from 'lucide-react';
+import { Zap, CheckCircle2, XCircle, ArrowLeft, ChevronRight, MapPin } from 'lucide-react';
 import { gsap } from 'gsap';
 import Magnetic from '../components/Magnetic';
 import { API_BASE } from '../config';
@@ -63,7 +63,6 @@ const UserDashboard = () => {
   const [selectedStation, setSelectedStation] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const [bookingMessage, setBookingMessage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [mapInstance, setMapInstance] = useState<any>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -171,20 +170,16 @@ const UserDashboard = () => {
     }
   };
 
-  const filteredStations = stations.filter(s => 
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   useEffect(() => {
-    if (!mapInstance || filteredStations.length === 0 || selectedStation) return;
+    if (!mapInstance || stations.length === 0 || selectedStation) return;
 
-    const bounds = L.latLngBounds(filteredStations.map((station) => [station.lat, station.lng]));
+    const bounds = L.latLngBounds(stations.map((station) => [station.lat, station.lng]));
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lng]);
     }
 
     mapInstance.fitBounds(bounds, { padding: [60, 60] });
-  }, [mapInstance, stations, searchQuery, userLocation, selectedStation]);
+  }, [mapInstance, stations, userLocation, selectedStation]);
 
   return (
     <div className="pt-24 pb-12 md:pt-32 md:pb-20 max-w-[1600px] mx-auto px-4 sm:px-6">
@@ -196,21 +191,6 @@ const UserDashboard = () => {
             <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">Distance-Locked Booking System (2km Limit)</p>
           </div>
 
-          <div className="dashboard-animate relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
-            <form onSubmit={(e) => e.preventDefault()} className="relative flex glass rounded-2xl overflow-hidden">
-              <input 
-                type="text" 
-                placeholder="Search EV Centers..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent px-6 py-4 outline-none text-sm font-medium"
-              />
-              <button type="button" className="px-6 bg-white/5 hover:bg-white/10 transition-colors">
-                <Search className="w-5 h-5 text-primary" />
-              </button>
-            </form>
-          </div>
 
           {selectedStation ? (
             <div className="dashboard-animate glass rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 space-y-6 sm:space-y-8 relative overflow-hidden">
@@ -293,11 +273,11 @@ const UserDashboard = () => {
           ) : (
             <div className="dashboard-animate space-y-4">
               <div className="px-2 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Active Nodes ({filteredStations.length})</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Active Nodes ({stations.length})</span>
                 <span className="text-[9px] font-bold uppercase tracking-widest text-primary">Click any station to view</span>
               </div>
               <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-                {filteredStations.map(station => {
+                {stations.map(station => {
                   const freeCount = station.slots ? station.slots.filter((s: any) => s.status === 'empty').length : 0;
                   const totalCount = station.slots ? station.slots.length : 0;
                   const distance = userLocation ? calculateDistance(userLocation.lat, userLocation.lng, station.lat, station.lng) : null;
@@ -340,7 +320,7 @@ const UserDashboard = () => {
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               />
-              {filteredStations.map(station => (
+              {stations.map(station => (
                 <Marker 
                   key={station.id} 
                   position={[station.lat, station.lng]} 

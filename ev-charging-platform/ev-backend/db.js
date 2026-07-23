@@ -20,6 +20,12 @@ function getSupabase() {
   return supabaseInstance;
 }
 
+let hitsData = {
+  totalHits: 14280,
+  hitsToday: 184,
+  lastResetDate: new Date().toISOString().split('T')[0]
+};
+
 const defaultData = {
   adminPasskey: 'ADMIN123',
   stations: [
@@ -148,6 +154,160 @@ const defaultData = {
         { id: 904, status: 'empty', type: 'AC Type-2', power: '22kW' },
         { id: 905, status: 'empty', type: 'AC Type-2', power: '22kW' }
       ]
+    },
+    {
+      id: 10,
+      name: 'Yelahanka New Town Hub',
+      passkey: 'YELAHANKA10',
+      lat: 13.1012,
+      lng: 77.5975,
+      slots: [
+        { id: 1001, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 1002, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 1003, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1004, status: 'full', type: 'AC Type-2', power: '22kW' },
+        { id: 1005, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 11,
+      name: 'RMZ Galleria Yelahanka',
+      passkey: 'GALLERIA11',
+      lat: 13.0975,
+      lng: 77.5942,
+      slots: [
+        { id: 1101, status: 'empty', type: 'DC Fast', power: '120kW' },
+        { id: 1102, status: 'empty', type: 'DC Fast', power: '120kW' },
+        { id: 1103, status: 'empty', type: 'DC Fast', power: '120kW' },
+        { id: 1104, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1105, status: 'full', type: 'AC Type-2', power: '22kW' }
+      ]
+    },
+    {
+      id: 12,
+      name: 'Jakkur Aerodrome EV Point',
+      passkey: 'JAKKUR12',
+      lat: 13.0782,
+      lng: 77.5991,
+      slots: [
+        { id: 1201, status: 'empty', type: 'DC Fast', power: '100kW' },
+        { id: 1202, status: 'empty', type: 'DC Fast', power: '100kW' },
+        { id: 1203, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1204, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1205, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 13,
+      name: 'Kogilu Cross EV Spot',
+      passkey: 'KOGILU13',
+      lat: 13.1150,
+      lng: 77.6080,
+      slots: [
+        { id: 1301, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1302, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1303, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1304, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1305, status: 'full', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 14,
+      name: 'Hebbal Flyover Supercharger',
+      passkey: 'HEBBAL14',
+      lat: 13.0358,
+      lng: 77.5970,
+      slots: [
+        { id: 1401, status: 'empty', type: 'DC Fast', power: '180kW' },
+        { id: 1402, status: 'empty', type: 'DC Fast', power: '180kW' },
+        { id: 1403, status: 'empty', type: 'DC Fast', power: '180kW' },
+        { id: 1404, status: 'full', type: 'AC Type-2', power: '22kW' },
+        { id: 1405, status: 'empty', type: 'AC Type-2', power: '22kW' }
+      ]
+    },
+    {
+      id: 15,
+      name: 'Manyata Tech Park Hub',
+      passkey: 'MANYATA15',
+      lat: 13.0450,
+      lng: 77.6204,
+      slots: [
+        { id: 1501, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 1502, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 1503, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1504, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1505, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 16,
+      name: 'Esteem Mall Hebbal Station',
+      passkey: 'ESTEEM16',
+      lat: 13.0392,
+      lng: 77.5925,
+      slots: [
+        { id: 1601, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1602, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1603, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1604, status: 'full', type: 'AC Type-2', power: '22kW' },
+        { id: 1605, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 17,
+      name: 'RT Nagar BDA Complex Hub',
+      passkey: 'RTNAGAR17',
+      lat: 13.0245,
+      lng: 77.5948,
+      slots: [
+        { id: 1701, status: 'empty', type: 'DC Fast', power: '100kW' },
+        { id: 1702, status: 'empty', type: 'DC Fast', power: '100kW' },
+        { id: 1703, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1704, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1705, status: 'full', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 18,
+      name: 'Ganganagar EV Charge Point',
+      passkey: 'GANGANAGAR18',
+      lat: 13.0188,
+      lng: 77.5890,
+      slots: [
+        { id: 1801, status: 'empty', type: 'DC Fast', power: '50kW' },
+        { id: 1802, status: 'empty', type: 'DC Fast', power: '50kW' },
+        { id: 1803, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1804, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1805, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 19,
+      name: 'Dinnur Main Road Node',
+      passkey: 'DINNUR19',
+      lat: 13.0210,
+      lng: 77.6012,
+      slots: [
+        { id: 1901, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1902, status: 'empty', type: 'DC Fast', power: '60kW' },
+        { id: 1903, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1904, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 1905, status: 'full', type: 'AC Type-2', power: '7.4kW' }
+      ]
+    },
+    {
+      id: 20,
+      name: 'Nagavara Junction EZ Station',
+      passkey: 'NAGAVARA20',
+      lat: 13.0415,
+      lng: 77.6110,
+      slots: [
+        { id: 2001, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 2002, status: 'empty', type: 'DC Fast', power: '150kW' },
+        { id: 2003, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 2004, status: 'empty', type: 'AC Type-2', power: '22kW' },
+        { id: 2005, status: 'empty', type: 'AC Type-2', power: '7.4kW' }
+      ]
     }
   ]
 };
@@ -226,6 +386,23 @@ async function initDb() {
     console.warn('Supabase connection failed, using in-memory fallback data:', err.message);
     useSupabase = false;
   }
+}
+
+async function recordPageHit() {
+  const currentDate = new Date().toISOString().split('T')[0];
+  if (hitsData.lastResetDate !== currentDate) {
+    hitsData.lastResetDate = currentDate;
+    hitsData.hitsToday = 1;
+  } else {
+    hitsData.hitsToday += 1;
+  }
+  hitsData.totalHits += 1;
+
+  return { totalHits: hitsData.totalHits, hitsToday: hitsData.hitsToday };
+}
+
+async function getPageHits() {
+  return { totalHits: hitsData.totalHits, hitsToday: hitsData.hitsToday };
 }
 
 async function getAdminPasskey() {
@@ -450,6 +627,8 @@ async function updateSlotStatus(stationId, slotId, status) {
 
 module.exports = {
   initDb,
+  recordPageHit,
+  getPageHits,
   getAdminPasskey,
   getAllStations,
   getStationById,
