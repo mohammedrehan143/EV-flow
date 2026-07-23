@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Zap, Navigation, Search, CheckCircle2, XCircle } from 'lucide-react';
+import { Zap, Search, CheckCircle2, XCircle, ArrowLeft, ChevronRight, MapPin } from 'lucide-react';
 import { gsap } from 'gsap';
 import Magnetic from '../components/Magnetic';
+import { API_BASE } from '../config';
 
 // Resolve Leaflet default icon asset path issues in Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -27,10 +28,10 @@ const MapController = ({ setMapInstance }: { setMapInstance: (map: L.Map) => voi
 const evIcon = L.divIcon({
   className: 'custom-ev-icon',
   html: `
-    <div class="w-12 h-12 relative flex items-center justify-center">
-      <div class="absolute w-12 h-12 bg-primary/40 rounded-full animate-ping"></div>
-      <div class="relative w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-[0_0_20px_#00ff88] border-2 border-dark">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#050505" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <div class="ev-marker-wrapper">
+      <div class="ev-marker-ping"></div>
+      <div class="ev-marker-core">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#050505" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="6" width="14" height="12" rx="2" ry="2" />
           <line x1="21" y1="11" x2="21" y2="13" />
           <path d="m11 8-3 4h4l-3 4" fill="#050505" />
@@ -46,9 +47,9 @@ const evIcon = L.divIcon({
 const userIcon = L.divIcon({
   className: 'custom-user-icon',
   html: `
-    <div class="w-8 h-8 relative flex items-center justify-center">
-      <div class="absolute w-8 h-8 bg-secondary/30 rounded-full animate-ping"></div>
-      <div class="relative w-4 h-4 bg-secondary rounded-full border-2 border-white shadow-[0_0_10px_#00bfff]"></div>
+    <div class="user-marker-wrapper">
+      <div class="user-marker-ping"></div>
+      <div class="user-marker-core"></div>
     </div>
   `,
   iconSize: [32, 32],
@@ -56,7 +57,6 @@ const userIcon = L.divIcon({
 });
 
 const center: [number, number] = [12.9716, 77.5946];
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const UserDashboard = () => {
   const [stations, setStations] = useState<any[]>([]);
@@ -65,19 +65,19 @@ const UserDashboard = () => {
   const [bookingMessage, setBookingMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [mapInstance, setMapInstance] = useState<any>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchStations();
     getUserLocation();
     
-    // Simpler animation to avoid visibility lock
     gsap.from(".dashboard-animate", {
       opacity: 0,
       y: 20,
       duration: 0.6,
       stagger: 0.1,
       ease: "power2.out",
-      clearProps: "all" // Ensures GSAP doesn't leave elements hidden
+      clearProps: "all"
     });
   }, []);
 
@@ -115,6 +115,17 @@ const UserDashboard = () => {
     return R * c;
   };
 
+  const handleSelectStation = (station: any) => {
+    setSelectedStation(station);
+    setBookingMessage("");
+    if (mapInstance && station) {
+      mapInstance.setView([station.lat, station.lng], 15, { animate: true });
+    }
+    if (sidebarRef.current) {
+      sidebarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleBook = async (stationId: number, slotId: number) => {
     if (!userLocation) {
       setBookingMessage("ERROR: Please enable location to book.");
@@ -134,7 +145,6 @@ const UserDashboard = () => {
       await axios.post(`${API_BASE}/api/bookings`, { stationId, slotId, userId: 'user123' });
       setBookingMessage("SUCCESS: Reservation confirmed!");
       fetchStations();
-      setSelectedStation(null);
     } catch (err: any) {
       setBookingMessage("FAILED: " + (err.response?.data?.error || "Unknown error"));
     }
@@ -146,39 +156,41 @@ const UserDashboard = () => {
       return;
     }
     try {
-      await axios.post(`${API_BASE}/api/stations/debug`, {
+      const res = await axios.post(`${API_BASE}/api/stations/debug`, {
         lat: userLocation.lat,
         lng: userLocation.lng,
         name: "DEBUG: Local Node"
       });
-      fetchStations();
+      await fetchStations();
+      if (res.data?.station) {
+        handleSelectStation(res.data.station);
+      }
       setBookingMessage("SUCCESS: Test node deployed at your location.");
     } catch (err) {
       console.error("Debug deployment failed", err);
     }
   };
 
+  const filteredStations = stations.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   useEffect(() => {
-    if (!mapInstance || stations.length === 0) return;
+    if (!mapInstance || filteredStations.length === 0 || selectedStation) return;
 
-    if (stations.length === 1) {
-      mapInstance.setView([stations[0].lat, stations[0].lng], 13);
-      return;
-    }
-
-    const bounds = L.latLngBounds(stations.map((station) => [station.lat, station.lng]));
+    const bounds = L.latLngBounds(filteredStations.map((station) => [station.lat, station.lng]));
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lng]);
     }
 
     mapInstance.fitBounds(bounds, { padding: [60, 60] });
-  }, [mapInstance, stations, userLocation]);
+  }, [mapInstance, stations, searchQuery, userLocation, selectedStation]);
 
   return (
     <div className="pt-24 pb-12 md:pt-32 md:pb-20 max-w-[1600px] mx-auto px-4 sm:px-6">
       <div className="flex flex-col xl:flex-row gap-6 md:gap-10">
         {/* Sidebar */}
-        <div className="w-full xl:w-[450px] space-y-6 sm:space-y-8 order-2 xl:order-1">
+        <div ref={sidebarRef} className="w-full xl:w-[480px] space-y-6 sm:space-y-8 order-2 xl:order-1 scroll-mt-28">
           <div className="dashboard-animate">
             <h2 className="font-display text-3xl sm:text-4xl font-black tracking-tighter mb-2 italic">GRID INTERFACE</h2>
             <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">Distance-Locked Booking System (2km Limit)</p>
@@ -186,7 +198,7 @@ const UserDashboard = () => {
 
           <div className="dashboard-animate relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
-            <form className="relative flex glass rounded-2xl overflow-hidden">
+            <form onSubmit={(e) => e.preventDefault()} className="relative flex glass rounded-2xl overflow-hidden">
               <input 
                 type="text" 
                 placeholder="Search EV Centers..." 
@@ -194,7 +206,7 @@ const UserDashboard = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent px-6 py-4 outline-none text-sm font-medium"
               />
-              <button className="px-6 bg-white/5 hover:bg-white/10 transition-colors">
+              <button type="button" className="px-6 bg-white/5 hover:bg-white/10 transition-colors">
                 <Search className="w-5 h-5 text-primary" />
               </button>
             </form>
@@ -202,16 +214,26 @@ const UserDashboard = () => {
 
           {selectedStation ? (
             <div className="dashboard-animate glass rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 space-y-6 sm:space-y-8 relative overflow-hidden">
-              <div className="flex items-center justify-between">
+              <button 
+                onClick={() => setSelectedStation(null)}
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back to station grid
+              </button>
+
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-3xl font-black tracking-tighter mb-2">{selectedStation.name}</h3>
-                  {userLocation && (
-                    <p className="text-primary text-[10px] font-black uppercase tracking-widest">
+                  <h3 className="text-2xl sm:text-3xl font-black tracking-tighter mb-2">{selectedStation.name}</h3>
+                  {userLocation ? (
+                    <p className="text-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5" />
                       Distance: {calculateDistance(userLocation.lat, userLocation.lng, selectedStation.lat, selectedStation.lng).toFixed(2)} km
                     </p>
+                  ) : (
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Enable location to check range</p>
                   )}
                 </div>
-                <div className={`p-4 rounded-2xl ${
+                <div className={`p-4 rounded-2xl shrink-0 ${
                   userLocation && calculateDistance(userLocation.lat, userLocation.lng, selectedStation.lat, selectedStation.lng) <= 2 
                   ? 'bg-primary/20 text-primary' 
                   : 'bg-red-500/20 text-red-500'
@@ -226,7 +248,7 @@ const UserDashboard = () => {
               <div className="space-y-4">
                 {selectedStation.slots.map((slot: any) => (
                   <div key={slot.id} className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl border transition-all ${
-                    slot.status === 'empty' ? 'bg-white/5 border-white/10' : 'bg-red-500/5 border-transparent opacity-40 grayscale'
+                    slot.status === 'empty' ? 'bg-white/5 border-white/10 hover:border-primary/40' : 'bg-red-500/5 border-transparent opacity-40 grayscale'
                   }`}>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -244,7 +266,7 @@ const UserDashboard = () => {
                         <button 
                           onClick={() => handleBook(selectedStation.id, slot.id)}
                           disabled={!userLocation || calculateDistance(userLocation.lat, userLocation.lng, selectedStation.lat, selectedStation.lng) > 2}
-                          className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${
+                          className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all cursor-pointer ${
                             userLocation && calculateDistance(userLocation.lat, userLocation.lng, selectedStation.lat, selectedStation.lng) <= 2
                             ? 'bg-primary text-dark hover:scale-[1.02] shadow-[0_10px_30px_rgba(0,255,136,0.3)]'
                             : 'bg-white/5 text-white/20 cursor-not-allowed'
@@ -269,10 +291,42 @@ const UserDashboard = () => {
               )}
             </div>
           ) : (
-            <div className="dashboard-animate glass rounded-[1.5rem] sm:rounded-[3rem] p-8 sm:p-16 text-center border-dashed border-white/10">
-              <Navigation className="w-12 h-12 text-white/10 mx-auto mb-6 animate-pulse" />
-              <h4 className="text-xl font-black tracking-tight mb-2 uppercase">Awaiting Selection</h4>
-              <p className="text-white/30 text-[10px] font-black leading-relaxed uppercase tracking-widest">Select an active EV node on the map to view infrastructure details.</p>
+            <div className="dashboard-animate space-y-4">
+              <div className="px-2 flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Active Nodes ({filteredStations.length})</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-primary">Click any station to view</span>
+              </div>
+              <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+                {filteredStations.map(station => {
+                  const freeCount = station.slots ? station.slots.filter((s: any) => s.status === 'empty').length : 0;
+                  const totalCount = station.slots ? station.slots.length : 0;
+                  const distance = userLocation ? calculateDistance(userLocation.lat, userLocation.lng, station.lat, station.lng) : null;
+                  const inRange = distance !== null && distance <= 2;
+
+                  return (
+                    <div 
+                      key={station.id}
+                      onClick={() => handleSelectStation(station)}
+                      className="p-5 glass rounded-2xl border border-white/10 hover:border-primary/50 transition-all cursor-pointer group flex items-center justify-between gap-4"
+                    >
+                      <div className="space-y-1">
+                        <h4 className="font-black text-sm uppercase tracking-tight group-hover:text-primary transition-colors">{station.name}</h4>
+                        <div className="flex items-center gap-3 text-[10px] text-white/50 font-bold uppercase tracking-widest">
+                          <span className="text-primary">{freeCount} / {totalCount} Slots Free</span>
+                          {distance !== null && (
+                            <span className={inRange ? "text-primary" : "text-white/30"}>
+                              • {distance.toFixed(1)} km
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="w-10 h-10 rounded-xl bg-white/5 group-hover:bg-primary group-hover:text-dark flex items-center justify-center transition-colors shrink-0">
+                        <ChevronRight className="w-5 h-5" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -286,12 +340,12 @@ const UserDashboard = () => {
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               />
-              {stations.map(station => (
+              {filteredStations.map(station => (
                 <Marker 
                   key={station.id} 
                   position={[station.lat, station.lng]} 
                   icon={evIcon}
-                  eventHandlers={{ click: () => setSelectedStation(station) }}
+                  eventHandlers={{ click: () => handleSelectStation(station) }}
                 >
                   <Popup>
                     <div className="p-2 text-center">
@@ -300,8 +354,8 @@ const UserDashboard = () => {
                         {station.slots.filter((s: any) => s.status === 'empty').length} / {station.slots.length} Slots Free
                       </p>
                       <button 
-                        onClick={() => setSelectedStation(station)}
-                        className="bg-primary text-dark font-black text-[9px] px-4 py-2 rounded-full uppercase tracking-widest"
+                        onClick={() => handleSelectStation(station)}
+                        className="bg-primary text-dark font-black text-[9px] px-4 py-2 rounded-full uppercase tracking-widest cursor-pointer"
                       >
                         Interface Node
                       </button>
@@ -326,7 +380,7 @@ const UserDashboard = () => {
               
               <button 
                 onClick={deployTestStation}
-                className="group flex items-center gap-3 p-4 glass rounded-2xl border-white/10 hover:border-primary/50 transition-all"
+                className="group flex items-center gap-3 p-4 glass rounded-2xl border-white/10 hover:border-primary/50 transition-all cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-dark transition-colors">
                   <Zap className="w-4 h-4" />

@@ -5,15 +5,18 @@ const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_KEY || '';
 
 let supabaseInstance = null;
+let useSupabase = false;
 
 function getSupabase() {
   if (supabaseInstance) return supabaseInstance;
 
   if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
-    throw new Error('Supabase database client is not configured. Please fill in SUPABASE_URL and SUPABASE_KEY in your .env file.');
+    throw new Error('Supabase database client is not configured.');
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseKey);
+  supabaseInstance = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
   return supabaseInstance;
 }
 
@@ -149,16 +152,18 @@ const defaultData = {
   ]
 };
 
+const fallbackStations = JSON.parse(JSON.stringify(defaultData.stations));
+
 async function initDb() {
   if (!supabaseUrl || !supabaseUrl.startsWith('http')) {
-    console.warn('WARNING: Supabase URL is not configured. Server running, but database connection is waiting for environment variables to be filled in .env.');
+    console.warn('WARNING: Supabase URL is not configured. Using in-memory fallback data.');
+    useSupabase = false;
     return;
   }
 
   try {
     const supabase = getSupabase();
 
-    // 1. Seed admin key
     const { data: adminKeyRow, error: adminErr } = await supabase
       .from('settings')
       .select('value')
@@ -166,7 +171,8 @@ async function initDb() {
       .maybeSingle();
 
     if (adminErr) {
-      console.warn('Could not query settings table. Ensure tables are created using supabase_schema.sql.');
+      console.warn('Could not query settings table. Using in-memory fallback data:', adminErr.message);
+      useSupabase = false;
       return;
     }
 
@@ -176,10 +182,15 @@ async function initDb() {
         .insert([{ key: 'adminPasskey', value: defaultData.adminPasskey }]);
     }
 
-    // 2. Seed default stations if table is empty
-    const { data: stations, error: countErr } = await supabase
+    const { data: stations, error: stationsErr } = await supabase
       .from('stations')
       .select('id');
+
+    if (stationsErr) {
+      console.warn('Could not query stations table. Using in-memory fallback data:', stationsErr.message);
+      useSupabase = false;
+      return;
+    }
 
     if (stations && stations.length === 0) {
       console.log('Seeding Supabase database with default stations...');
@@ -208,12 +219,18 @@ async function initDb() {
       }
       console.log('Supabase seeding complete.');
     }
+
+    useSupabase = true;
+    console.log('Connected to Supabase successfully.');
   } catch (err) {
-    console.error('Error seeding Supabase:', err.message);
+    console.warn('Supabase connection failed, using in-memory fallback data:', err.message);
+    useSupabase = false;
   }
 }
 
 async function getAdminPasskey() {
+  if (!useSupabase) return defaultData.adminPasskey;
+
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase
@@ -222,129 +239,213 @@ async function getAdminPasskey() {
       .eq('key', 'adminPasskey')
       .maybeSingle();
 
-    return data ? data.value : 'ADMIN123';
+    if (error || !data) return defaultData.adminPasskey;
+    return data.value || defaultData.adminPasskey;
   } catch (err) {
-    return 'ADMIN123';
+    return defaultData.adminPasskey;
   }
 }
 
 async function getAllStations() {
-  const supabase = getSupabase();
-  
-  const { data: stations, error: stationsErr } = await supabase
-    .from('stations')
-    .select('*');
-
-  const { data: slots, error: slotsErr } = await supabase
-    .from('slots')
-    .select('*');
-
-  if (stationsErr || slotsErr) {
-    throw new Error(stationsErr?.message || slotsErr?.message || 'Database fetch error');
+  if (!useSupabase) {
+    return JSON.parse(JSON.stringify(fallbackStations));
   }
 
-  return (stations || []).map(station => {
-    const stationSlots = (slots || [])
-      .filter(s => s.station_id === station.id)
-      .map(s => ({
-        id: s.slot_index,
-        status: s.status,
-        type: s.type,
-        power: s.power
-      }));
+  try {
+    const supabase = getSupabase();
 
-    return {
-      id: station.id,
-      name: station.name,
-      passkey: station.passkey,
-      lat: station.lat,
-      lng: station.lng,
-      slots: stationSlots
-    };
-  });
+    const { data: stations, error: stationsErr } = await supabase
+      .from('stations')
+      .select('*')
+      .order('id', { ascending: true });
+
+    const { data: slots, error: slotsErr } = await supabase
+      .from('slots')
+      .select('*')
+      .order('slot_index', { ascending: true });
+
+    if (stationsErr || slotsErr || !stations) {
+      console.warn('Supabase fetch error, using in-memory fallback stations:', stationsErr?.message || slotsErr?.message);
+      useSupabase = false;
+      return JSON.parse(JSON.stringify(fallbackStations));
+    }
+
+    return stations.map(station => {
+      const stationSlots = (slots || [])
+        .filter(s => String(s.station_id) === String(station.id))
+        .map(s => ({
+          id: Number(s.slot_index),
+          status: s.status,
+          type: s.type,
+          power: s.power
+        }));
+
+      return {
+        id: Number(station.id),
+        name: station.name,
+        passkey: station.passkey,
+        lat: Number(station.lat),
+        lng: Number(station.lng),
+        slots: stationSlots
+      };
+    });
+  } catch (err) {
+    console.warn('Supabase query failed, using in-memory fallback stations:', err.message);
+    useSupabase = false;
+    return JSON.parse(JSON.stringify(fallbackStations));
+  }
 }
 
 async function getStationById(id) {
-  const supabase = getSupabase();
+  const numericId = Number(id);
+  if (!useSupabase) {
+    return fallbackStations.find(s => Number(s.id) === numericId) || null;
+  }
 
-  const { data: station, error: stationErr } = await supabase
-    .from('stations')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  try {
+    const supabase = getSupabase();
 
-  if (!station) return null;
+    const { data: station, error: stationErr } = await supabase
+      .from('stations')
+      .select('*')
+      .eq('id', numericId)
+      .maybeSingle();
 
-  const { data: slots, error: slotsErr } = await supabase
-    .from('slots')
-    .select('*')
-    .eq('station_id', id);
+    if (stationErr || !station) {
+      return fallbackStations.find(s => Number(s.id) === numericId) || null;
+    }
 
-  const stationSlots = (slots || []).map(s => ({
-    id: s.slot_index,
-    status: s.status,
-    type: s.type,
-    power: s.power
-  }));
+    const { data: slots } = await supabase
+      .from('slots')
+      .select('*')
+      .eq('station_id', numericId);
 
-  return {
-    id: station.id,
-    name: station.name,
-    passkey: station.passkey,
-    lat: station.lat,
-    lng: station.lng,
-    slots: stationSlots
-  };
+    const stationSlots = (slots || []).map(s => ({
+      id: Number(s.slot_index),
+      status: s.status,
+      type: s.type,
+      power: s.power
+    }));
+
+    return {
+      id: Number(station.id),
+      name: station.name,
+      passkey: station.passkey,
+      lat: Number(station.lat),
+      lng: Number(station.lng),
+      slots: stationSlots
+    };
+  } catch (err) {
+    console.warn('Supabase getStationById failed, using fallback:', err.message);
+    return fallbackStations.find(s => Number(s.id) === numericId) || null;
+  }
 }
 
 async function addStation(name, passkey, lat, lng, slots) {
-  const supabase = getSupabase();
   const id = Date.now();
-  
-  const { error: stationErr } = await supabase
-    .from('stations')
-    .insert([{ id, name, passkey, lat, lng }]);
+  const parsedLat = parseFloat(lat);
+  const parsedLng = parseFloat(lng);
+  const newStation = {
+    id,
+    name,
+    passkey,
+    lat: parsedLat,
+    lng: parsedLng,
+    slots: slots.map(slot => ({
+      id: Number(slot.id || Math.floor(Math.random() * 1000)),
+      status: slot.status || 'empty',
+      type: slot.type || 'DC Fast',
+      power: slot.power || '100kW'
+    }))
+  };
 
-  if (stationErr) throw stationErr;
+  fallbackStations.push(newStation);
 
-  const slotsToInsert = slots.map(slot => ({
-    station_id: id,
-    slot_index: slot.id || Math.floor(Math.random() * 1000),
-    status: slot.status,
-    type: slot.type,
-    power: slot.power
-  }));
+  if (!useSupabase) {
+    return JSON.parse(JSON.stringify(newStation));
+  }
 
-  const { error: slotsErr } = await supabase
-    .from('slots')
-    .insert(slotsToInsert);
+  try {
+    const supabase = getSupabase();
+    const { error: stationErr } = await supabase
+      .from('stations')
+      .insert([{ id, name, passkey, lat: parsedLat, lng: parsedLng }]);
 
-  if (slotsErr) throw slotsErr;
+    if (stationErr) {
+      console.warn('Supabase addStation error:', stationErr.message);
+      return JSON.parse(JSON.stringify(newStation));
+    }
 
-  return getStationById(id);
+    const slotsToInsert = slots.map(slot => ({
+      station_id: id,
+      slot_index: Number(slot.id || Math.floor(Math.random() * 1000)),
+      status: slot.status || 'empty',
+      type: slot.type || 'DC Fast',
+      power: slot.power || '100kW'
+    }));
+
+    const { error: slotsErr } = await supabase
+      .from('slots')
+      .insert(slotsToInsert);
+
+    if (slotsErr) {
+      console.warn('Supabase addStation slots insert error:', slotsErr.message);
+    }
+  } catch (err) {
+    console.warn('Supabase addStation failed, saved to fallback:', err.message);
+  }
+
+  return JSON.parse(JSON.stringify(newStation));
 }
 
 async function updateStationPasskey(stationId, newPasskey) {
-  const supabase = getSupabase();
+  const numericId = Number(stationId);
+  const localStation = fallbackStations.find(s => Number(s.id) === numericId);
+  if (localStation) {
+    localStation.passkey = newPasskey;
+  }
 
-  const { error } = await supabase
-    .from('stations')
-    .update({ passkey: newPasskey })
-    .eq('id', stationId);
+  if (!useSupabase) return;
 
-  if (error) throw error;
+  try {
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('stations')
+      .update({ passkey: newPasskey })
+      .eq('id', numericId);
+
+    if (error) console.warn('Supabase updateStationPasskey error:', error.message);
+  } catch (err) {
+    console.warn('Supabase updateStationPasskey failed:', err.message);
+  }
 }
 
 async function updateSlotStatus(stationId, slotId, status) {
-  const supabase = getSupabase();
+  const numericStationId = Number(stationId);
+  const numericSlotId = Number(slotId);
 
-  const { error } = await supabase
-    .from('slots')
-    .update({ status: status })
-    .eq('station_id', stationId)
-    .eq('slot_index', slotId);
+  const localStation = fallbackStations.find(s => Number(s.id) === numericStationId);
+  if (localStation) {
+    const localSlot = localStation.slots.find(s => Number(s.id) === numericSlotId);
+    if (localSlot) {
+      localSlot.status = status;
+    }
+  }
 
-  if (error) throw error;
+  if (!useSupabase) return;
+
+  try {
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('slots')
+      .update({ status: status })
+      .eq('station_id', numericStationId)
+      .eq('slot_index', numericSlotId);
+
+    if (error) console.warn('Supabase updateSlotStatus error:', error.message);
+  } catch (err) {
+    console.warn('Supabase updateSlotStatus failed:', err.message);
+  }
 }
 
 module.exports = {

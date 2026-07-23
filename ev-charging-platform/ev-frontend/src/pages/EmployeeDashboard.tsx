@@ -4,7 +4,7 @@ import { ShieldCheck, RefreshCcw, Power, Activity, Layout, Lock, ArrowRight } fr
 import { gsap } from 'gsap';
 import Magnetic from '../components/Magnetic';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_BASE } from '../config';
 
 const EmployeeDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

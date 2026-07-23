@@ -100,6 +100,79 @@ body::before {
   box-shadow: none !important;
 }
 
+/* Green Station Marker styling */
+.ev-marker-wrapper {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ev-marker-ping {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 255, 136, 0.4);
+  border-radius: 50%;
+  animation: evPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.ev-marker-core {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background-color: #00ff88;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px #00ff88, 0 0 35px rgba(0, 255, 136, 0.6);
+  border: 2px solid #050505;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ev-marker-wrapper:hover .ev-marker-core {
+  transform: scale(1.18);
+  box-shadow: 0 0 30px #00ff88, 0 0 60px rgba(0, 255, 136, 0.9);
+}
+
+@keyframes evPing {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* User Location Marker styling */
+.user-marker-wrapper {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-marker-ping {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(0, 191, 255, 0.4);
+  border-radius: 50%;
+  animation: evPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.user-marker-core {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  background-color: #00bfff;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 15px #00bfff;
+}
+
 .leaflet-tile-pane {
   /* Adding a slight brightness boost to prevent 'dull' appearance */
   filter: brightness(1.2) contrast(1.1);
@@ -110,7 +183,6 @@ body::before {
   color: #00ff88 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
-
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
   background: #0c0c0c !important;

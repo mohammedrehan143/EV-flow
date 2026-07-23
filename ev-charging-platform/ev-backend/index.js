@@ -8,14 +8,23 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize database
+// Initialize database safely
 db.initDb()
   .then(() => {
-    console.log('Database initialized and seeded successfully.');
+    console.log('Database initialized successfully.');
   })
   .catch((err) => {
-    console.error('Failed to initialize SQLite database:', err);
+    console.error('Database initialization warning:', err.message);
   });
+
+// Root & Health check endpoints
+app.get('/', (req, res) => {
+  res.send('EVFLOW Backend API Services Operational');
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 app.post('/api/stations/debug', async (req, res) => {
   const { lat, lng, name } = req.body;
@@ -49,23 +58,23 @@ app.get('/api/stations', async (req, res) => {
 app.post('/api/auth', async (req, res) => {
   const { passkey } = req.body;
 
-  if (!passkey) {
+  if (!passkey || typeof passkey !== 'string') {
     return res.status(400).json({ error: 'Access key is required' });
   }
 
   try {
     const adminPasskey = await db.getAdminPasskey();
-    const trimmedKey = passkey.trim();
+    const trimmedKey = passkey.trim().toUpperCase();
 
-    if (trimmedKey === adminPasskey) {
+    if (trimmedKey === String(adminPasskey).trim().toUpperCase()) {
       return res.json({ authorizedStationId: 'ALL' });
     }
 
     const stations = await db.getAllStations();
-    const matchedStation = stations.find(s => s.passkey === trimmedKey);
+    const matchedStation = stations.find(s => s.passkey && String(s.passkey).trim().toUpperCase() === trimmedKey);
 
     if (!matchedStation) {
-      return res.status(401).json({ error: 'Invalid access key' });
+      return res.status(401).json({ error: 'Invalid access key. Try station passkey (e.g. TAJ123) or master admin key (ADMIN123).' });
     }
 
     res.json({ authorizedStationId: matchedStation.id });
@@ -89,13 +98,15 @@ app.put('/api/stations/:stationId/passkey', async (req, res) => {
     }
 
     const adminPasskey = await db.getAdminPasskey();
-    const allowed = authKey === adminPasskey || authKey === station.passkey;
+    const cleanAuth = String(authKey).trim().toUpperCase();
+    const allowed = cleanAuth === String(adminPasskey).trim().toUpperCase() || cleanAuth === String(station.passkey).trim().toUpperCase();
+    
     if (!allowed) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized: Invalid key' });
     }
 
-    await db.updateStationPasskey(parseInt(stationId), newPasskey);
-    res.json({ message: 'Passkey updated' });
+    await db.updateStationPasskey(parseInt(stationId), newPasskey.trim());
+    res.json({ message: 'Passkey updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update passkey: ' + err.message });
   }
@@ -141,5 +152,5 @@ app.post('/api/bookings', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
