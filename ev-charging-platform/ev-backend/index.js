@@ -151,7 +151,11 @@ app.put('/api/stations/:stationId/slots/:slotId', async (req, res) => {
 });
 
 app.post('/api/bookings', async (req, res) => {
-  const { stationId, slotId, userId } = req.body;
+  const { stationId, slotId, userName, vehicleNumber } = req.body;
+
+  if (!userName || !userName.trim() || !vehicleNumber || !vehicleNumber.trim()) {
+    return res.status(400).json({ error: 'Driver name and vehicle number are required.' });
+  }
 
   try {
     const station = await db.getStationById(parseInt(stationId));
@@ -163,9 +167,28 @@ app.post('/api/bookings', async (req, res) => {
     }
 
     await db.updateSlotStatus(parseInt(stationId), parseInt(slotId), 'full');
-    res.json({ message: 'Booking successful', bookingId: Math.random().toString(36).substr(2, 9) });
+    res.json({ 
+      message: 'Booking successful', 
+      bookingId: Math.random().toString(36).substr(2, 9),
+      userName: userName.trim(),
+      vehicleNumber: vehicleNumber.trim()
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to book slot: ' + err.message });
+  }
+});
+
+app.post('/api/bookings/cancel', async (req, res) => {
+  const { stationId, slotId } = req.body;
+
+  try {
+    const station = await db.getStationById(parseInt(stationId));
+    if (!station) return res.status(404).json({ error: 'Station not found' });
+
+    await db.updateSlotStatus(parseInt(stationId), parseInt(slotId), 'empty');
+    res.json({ message: 'Booking cancelled successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to cancel booking: ' + err.message });
   }
 });
 
